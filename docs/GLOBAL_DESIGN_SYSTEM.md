@@ -152,6 +152,19 @@ Domain components remain app-owned:
 - Writer manuscript/editor tools;
 - Physics scene/model/simulation controls.
 
+## Shared implementation
+
+The first-party apps use the same canonical shell classes from `styles/axion-ecosystem-shell.css`:
+
+- `.ax-ecosystem-bar` and `.ax-ecosystem-bar-inner` for the 28 px ecosystem strip;
+- `.ax-ecosystem-link` for app navigation and the active underline;
+- `.ax-ecosystem-project` for the quiet active Project context;
+- shared focus, selection, responsive spacing, and motion behavior.
+
+The file is currently mirrored in each repository so every app can build independently. Keep these mirrors behaviorally identical; move them to a workspace package once the repositories share a build root.
+
+Internal list, detail, form, archive, and editor pages use the `ax-work-*` primitives. Mathematics Laboratory keeps its scientific canvas and domain-specific controls, while `axion-math-chrome.css` maps legacy utility geometry and neutral colors back to the same `--ax-*` tokens.
+
 ## Token policy
 
 The canonical CSS variable namespace is `--ax-*`. App-specific tokens may map to these variables, but should not invent new global colors/spacing independently.
