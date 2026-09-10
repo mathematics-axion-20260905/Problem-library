@@ -5,6 +5,11 @@ from rest_framework.test import APITestCase
 
 
 class ScientificObjectTransferTests(APITestCase):
+    def test_health_probe(self):
+        response = self.client.get("/healthz/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()["status"], "ok")
+
     def test_transfer_round_trip_preserves_exact_payload(self):
         payload = json.dumps(
             {

@@ -28,6 +28,26 @@ Each frontend also needs its own backend API base in
 laboratory API, Notebook uses the Notebook backend, and Writer uses the Writer
 backend.
 
+## Pre-domain server checklist
+
+Until a domain and TLS are available, each app may run on its own host or port.
+Set the backend `.env` on every host rather than relying on development
+defaults:
+
+```text
+DJANGO_DEBUG=false
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,<server-ip>
+DJANGO_CORS_ALLOWED_ORIGINS=http://<science-ip>:<port>,http://<math-ip>:<port>,http://<notebook-ip>:<port>,http://<writer-ip>:<port>
+DJANGO_CSRF_TRUSTED_ORIGINS=http://<science-ip>:<port>,http://<math-ip>:<port>,http://<notebook-ip>:<port>,http://<writer-ip>:<port>
+DJANGO_SECURE_SSL_REDIRECT=false
+```
+
+Use the versioned backend systemd units in each repository's `ops/` directory.
+They load the private `.env` file, expose `/healthz/`, and can be installed
+independently on separate low-cost servers. The current relay is on the
+Problem-library backend, so every frontend's `NEXT_PUBLIC_ECOSYSTEM_CORE_URL`
+must point to that reachable API until a dedicated Platform Core is introduced.
+
 ## Transfer guarantees
 
 - the relay stores the exact serialized envelope, not a markdown projection;

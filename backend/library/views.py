@@ -3,6 +3,7 @@ import json
 from datetime import timedelta
 
 from django.db.models import Count, Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import filters, status, viewsets
@@ -100,6 +101,11 @@ def overview(request):
         ],
     }
     return Response(payload)
+
+
+def healthz(request):
+    """Small unauthenticated probe for the service manager and load balancer."""
+    return JsonResponse({"status": "ok", "service": "problem-library-backend"})
 
 
 MAX_TRANSFER_BYTES = 10 * 1024 * 1024

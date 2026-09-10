@@ -1,0 +1,15 @@
+[Unit]
+Description=Axion Problem Library backend
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/projects/Problem-library/backend
+EnvironmentFile=-/root/projects/Problem-library/backend/.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/root/projects/Problem-library/backend/.venv/bin/gunicorn config.wsgi:application --bind 0.0.0.0:8007 --workers 2 --timeout 120
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
