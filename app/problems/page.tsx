@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { allProblems } from "@/app/data";
 import { ProjectCreateModal } from "@/components/library/project-create-modal";
 import { ProblemDetailCard } from "@/components/problems/problem-detail-card";
+import { fetchLibraryApi } from "@/lib/api";
 
 export default function ProblemsPage() {
   const router = useRouter();
@@ -46,7 +47,7 @@ export default function ProblemsPage() {
     setMessage("");
 
     try {
-      const response = await fetch("http://localhost:8000/api/projects/", {
+      const response = await fetchLibraryApi("/api/projects/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -64,7 +65,7 @@ export default function ProblemsPage() {
       setForm({ title: "", topic: "", difficulty: "Medium", description: "" });
       setOpen(false);
     } catch {
-      setMessage("Backend connection failed. Check Django server on port 8000.");
+      setMessage("Backend connection failed. Check the configured Problem Library API.");
     } finally {
       setSaving(false);
     }

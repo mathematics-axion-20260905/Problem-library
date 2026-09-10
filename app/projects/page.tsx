@@ -6,15 +6,31 @@ import { BookOpenText, FileText, Sigma } from "lucide-react";
 import { AxActionLink, AxBadge, AxButton, AxEmptyState, AxField, AxInput } from "@/components/axion";
 import { getEcosystemHref } from "@/lib/ecosystem/apps";
 import { createLocalProject, deleteLocalProject, listLocalProjects, type LocalScienceProject } from "@/lib/ecosystem/local-projects";
+import { importLocalScientificObject } from "@/lib/ecosystem/local-object-store";
+import { discardScientificObjectTransfer, fetchScientificObjectTransfer } from "@/lib/ecosystem/transfer";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<LocalScienceProject[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [showCreate, setShowCreate] = useState(false);
+  const [transferNotice, setTransferNotice] = useState<string | null>(null);
 
   const refresh = () => setProjects(listLocalProjects());
   useEffect(() => refresh(), []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const transferId = params.get("transferId");
+    if (params.get("source") !== "transfer" || !transferId) return;
+    void fetchScientificObjectTransfer(transferId)
+      .then(async (transfer) => {
+        const object = await importLocalScientificObject(transfer.payload);
+        await discardScientificObjectTransfer(transferId);
+        setTransferNotice(`Scientific Object received: ${object.title}`);
+      })
+      .catch((error) => setTransferNotice(error instanceof Error ? error.message : "Scientific Object transfer failed."));
+  }, []);
 
   const recentProject = useMemo(() => projects[0], [projects]);
 
@@ -31,6 +47,7 @@ export default function ProjectsPage() {
   return (
     <div className="ax-workspace-root">
       <main className="ax-work-container">
+        {transferNotice ? <div className="mb-6 rounded-xl border border-[var(--ax-work-line)] bg-[var(--ax-surface)] px-4 py-3 text-xs text-[var(--ax-text-soft)]">{transferNotice}</div> : null}
         <section className="ax-work-pagehead">
           <div>
             <p className="ax-work-kicker">Projects</p>

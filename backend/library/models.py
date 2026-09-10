@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 
 
@@ -58,3 +60,24 @@ class Project(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+
+class ScientificObjectTransfer(models.Model):
+    """Short-lived, origin-independent transfer envelope for ecosystem handoffs.
+
+    The payload is intentionally stored as the exact serialized envelope. The
+    relay does not rewrite scientific data; target applications validate and
+    import it using their local Scientific Object contract.
+    """
+
+    public_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
+    payload = models.TextField()
+    content_hash = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(db_index=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return str(self.public_id)
