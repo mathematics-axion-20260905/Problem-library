@@ -64,3 +64,12 @@ must point to that reachable API until a dedicated Platform Core is introduced.
 The relay is a transport boundary, not the permanent Object Registry. A
 future Platform Core can replace it without changing the Scientific Object
 envelope.
+
+## Database backup
+
+The PostgreSQL deployment includes `ops/backup-postgres.sh` plus a daily
+systemd service/timer. Install those files on the host running this backend and
+verify a manual dump with `systemctl start axion-problem-library-postgres-backup.service`.
+Keep the generated `/var/backups/axion-problem-library` directory off the web
+root and perform a restore drill against a separate database before opening
+the service publicly.

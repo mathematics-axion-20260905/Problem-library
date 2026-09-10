@@ -1,0 +1,12 @@
+[Unit]
+Description=Axion Problem Library PostgreSQL backup
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+EnvironmentFile=/root/projects/Problem-library/backend/.env
+Environment=BACKUP_DIR=/var/backups/axion-problem-library
+Environment=SERVICE_NAME=axion-problem-library
+ExecStart=/root/projects/Problem-library/ops/backup-postgres.sh
