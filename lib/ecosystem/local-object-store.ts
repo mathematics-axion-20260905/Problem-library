@@ -10,6 +10,7 @@ import {
   type ScientificObjectRevision,
   type ScientificProvenance,
 } from "./contracts";
+import { createClientId } from "../client-id";
 
 const DB_NAME = "axion-science-local-v1";
 const DB_VERSION = 1;
@@ -31,8 +32,7 @@ export interface StoredScientificReference {
 }
 
 function makeId() {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
-  return `local-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  return createClientId("local");
 }
 
 function requireIndexedDb() {

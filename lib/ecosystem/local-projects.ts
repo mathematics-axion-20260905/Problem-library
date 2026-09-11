@@ -1,4 +1,5 @@
 import { deleteLocalScientificDataForProject } from "./local-project-cleanup";
+import { createClientId } from "../client-id";
 
 export interface LocalScienceProject {
   id: string;
@@ -16,10 +17,7 @@ function canUseBrowserStorage() {
 }
 
 function makeId() {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID();
-  }
-  return `local-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  return createClientId("local");
 }
 
 export function listLocalProjects(): LocalScienceProject[] {
