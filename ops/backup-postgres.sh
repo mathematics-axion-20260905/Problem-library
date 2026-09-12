@@ -9,6 +9,7 @@ backup_dir="${BACKUP_DIR:-/var/backups/axion-problem-library}"
 service_name="${SERVICE_NAME:-axion-problem-library}"
 stamp="$(date -u +%Y%m%dT%H%M%SZ)"
 dump_file="$backup_dir/${service_name}-${stamp}.dump"
+media_root="${MEDIA_ROOT:-}"
 
 umask 077
 install -d -m 700 "$backup_dir"
@@ -23,6 +24,14 @@ PGPASSWORD="$DB_PASSWORD" pg_dump \
   "$DB_NAME"
 sha256sum "$dump_file" > "$dump_file.sha256"
 
+if [[ -n "$media_root" && -d "$media_root" ]]; then
+  media_archive="$backup_dir/${service_name}-media-${stamp}.tar.gz"
+  tar -czf "$media_archive" -C "$media_root" .
+  sha256sum "$media_archive" > "$media_archive.sha256"
+fi
+
 find "$backup_dir" -type f -name '*.dump' -mtime +14 -delete
 find "$backup_dir" -type f -name '*.dump.sha256' -mtime +14 -delete
+find "$backup_dir" -type f -name '*-media-*.tar.gz' -mtime +14 -delete
+find "$backup_dir" -type f -name '*-media-*.tar.gz.sha256' -mtime +14 -delete
 printf 'Created %s\n' "$dump_file"

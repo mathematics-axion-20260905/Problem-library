@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Problem, ProblemGroup, Project
+from .models import Problem, ProblemGroup, Project, ProjectFile
 
 
 class ProblemSerializer(serializers.ModelSerializer):
@@ -76,3 +76,38 @@ class ProjectSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+        extra_kwargs = {
+            "topic": {"required": False, "default": "General"},
+            "difficulty": {"required": False, "default": "Unspecified"},
+            "status": {"required": False, "default": "draft"},
+        }
+
+
+class ProjectFileSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(source="public_id", read_only=True)
+    projectId = serializers.CharField(source="project_id", read_only=True)
+    originalName = serializers.CharField(source="original_name", read_only=True)
+    contentType = serializers.CharField(source="content_type", read_only=True)
+    contentHash = serializers.CharField(source="content_hash", read_only=True)
+    downloadUrl = serializers.SerializerMethodField()
+    createdAt = serializers.DateTimeField(source="created_at", read_only=True)
+
+    class Meta:
+        model = ProjectFile
+        fields = [
+            "id",
+            "projectId",
+            "originalName",
+            "size",
+            "contentType",
+            "contentHash",
+            "metadata",
+            "downloadUrl",
+            "createdAt",
+        ]
+
+    def get_downloadUrl(self, obj):
+        request = self.context.get("request")
+        if request is None:
+            return f"/api/ecosystem/files/{obj.public_id}/download/"
+        return request.build_absolute_uri(f"/api/ecosystem/files/{obj.public_id}/download/")

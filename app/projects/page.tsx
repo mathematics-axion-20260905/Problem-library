@@ -5,7 +5,7 @@ import { BookOpenText, FileText, Sigma } from "lucide-react";
 
 import { AxActionLink, AxBadge, AxButton, AxEmptyState, AxField, AxInput } from "@/components/axion";
 import { getEcosystemHref } from "@/lib/ecosystem/apps";
-import { createLocalProject, deleteLocalProject, listLocalProjects, type LocalScienceProject } from "@/lib/ecosystem/local-projects";
+import { createLocalProject, deleteLocalProject, listLocalProjects, listProjectsWithServer, syncLocalProject, type LocalScienceProject } from "@/lib/ecosystem/local-projects";
 import { importLocalScientificObject } from "@/lib/ecosystem/local-object-store";
 import { discardScientificObjectTransfer, fetchScientificObjectTransfer } from "@/lib/ecosystem/transfer";
 
@@ -17,7 +17,10 @@ export default function ProjectsPage() {
   const [transferNotice, setTransferNotice] = useState<string | null>(null);
 
   const refresh = () => setProjects(listLocalProjects());
-  useEffect(() => refresh(), []);
+  useEffect(() => {
+    setProjects(listLocalProjects());
+    void listProjectsWithServer().then(setProjects);
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -34,14 +37,15 @@ export default function ProjectsPage() {
 
   const recentProject = useMemo(() => projects[0], [projects]);
 
-  const handleCreate = (event: FormEvent<HTMLFormElement>) => {
+  const handleCreate = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const project = createLocalProject(title, description);
+    const synced = await syncLocalProject(project).catch(() => project);
     setTitle("");
     setDescription("");
     setShowCreate(false);
     refresh();
-    window.location.assign(getEcosystemHref("math", "science", project.id));
+    window.location.assign(getEcosystemHref("math", "science", synced.id));
   };
 
   return (
@@ -52,7 +56,7 @@ export default function ProjectsPage() {
           <div>
             <p className="ax-work-kicker">Projects</p>
             <h1 className="ax-work-title">One place for the research trail.</h1>
-            <p className="ax-work-lead">A Project keeps computation, reasoning and publication in one scientific context. Start locally, then open the instrument the work needs.</p>
+            <p className="ax-work-lead">A Project keeps computation, reasoning and publication in one scientific context. It syncs to the ecosystem core and remains usable from the local cache.</p>
             <div className="mt-7 flex flex-wrap gap-2.5">
               <AxButton variant="primary" onClick={() => setShowCreate(true)}>New project</AxButton>
               {recentProject ? <AxActionLink href={getEcosystemHref("math", "science", recentProject.id)}>Continue recent</AxActionLink> : null}
@@ -61,7 +65,7 @@ export default function ProjectsPage() {
           <div className="ax-work-stats">
             <div className="ax-work-stat"><div className="ax-work-stat-value">{projects.length}</div><div className="ax-work-stat-label">Projects</div></div>
             <div className="ax-work-stat"><div className="ax-work-stat-value">3</div><div className="ax-work-stat-label">Instruments</div></div>
-            <div className="ax-work-stat"><div className="ax-work-stat-value">Local</div><div className="ax-work-stat-label">Default</div></div>
+            <div className="ax-work-stat"><div className="ax-work-stat-value">Synced</div><div className="ax-work-stat-label">Storage</div></div>
           </div>
         </section>
 
@@ -84,7 +88,7 @@ export default function ProjectsPage() {
           ) : null}
 
           {!projects.length ? (
-            <AxEmptyState title="No project yet." description="Create one without signing in. The first research context stays on this device." action={<AxButton variant="primary" onClick={() => setShowCreate(true)}>Create first project</AxButton>} />
+            <AxEmptyState title="No project yet." description="Create one without signing in. The ecosystem core keeps the project available across app servers while the local cache covers short outages." action={<AxButton variant="primary" onClick={() => setShowCreate(true)}>Create first project</AxButton>} />
           ) : (
             <>
               <div className="mb-5 flex items-end justify-between gap-5">
@@ -96,7 +100,7 @@ export default function ProjectsPage() {
                   <article key={project.id} className="ax-work-row grid gap-5 px-1 py-6 sm:px-5 lg:grid-cols-[52px_minmax(0,1fr)_auto] lg:items-center lg:px-6">
                     <div className="font-serif text-[22px] text-[var(--ax-text-faint)]">{String(index + 1).padStart(2, "0")}</div>
                     <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2"><h2 className="truncate font-serif text-[29px] tracking-[-0.04em] text-[var(--ax-text)]">{project.title}</h2><AxBadge>Local</AxBadge></div>
+                      <div className="flex flex-wrap items-center gap-2"><h2 className="truncate font-serif text-[29px] tracking-[-0.04em] text-[var(--ax-text)]">{project.title}</h2><AxBadge>{project.storage === "server" ? "Synced" : "Local cache"}</AxBadge></div>
                       <p className="mt-2 max-w-2xl text-[12px] leading-6 text-[var(--ax-text-soft)]">{project.description || "No description yet."}</p>
                       <p className="mt-2 text-[9.5px] text-[var(--ax-text-faint)]">Updated {new Date(project.updatedAt).toLocaleString()}</p>
                     </div>
@@ -119,7 +123,7 @@ export default function ProjectsPage() {
           {[
             ["Project first", "The user sees one research context, not a folder of disconnected apps."],
             ["Object native", "Results stay structured so another instrument can reuse them without copy-paste."],
-            ["Local by default", "Start immediately on the device and keep an open path to sync or export later."],
+            ["Server-backed", "Projects sync to the ecosystem core; local cache keeps the workspace usable during a short outage."],
           ].map(([heading, body]) => (
             <div key={heading} className="py-7 md:px-8 md:first:pl-0 md:last:pr-0">
               <div className="font-[family-name:var(--ax-font-display)] text-[22px] tracking-[-0.03em]">{heading}</div>

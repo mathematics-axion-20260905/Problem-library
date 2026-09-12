@@ -1,15 +1,22 @@
 # Backend Migration Map
 
-Status: **future migration guidance, not current implementation**
+Status: **pre-auth Platform Core implementation**
 
-The current ecosystem milestone is local-first and does not introduce a new shared backend. This document exists only to prevent future work from accidentally expanding duplicated per-app infrastructure.
+The four products remain independent deploy units. Problem-library currently
+hosts the smallest shared Platform Core needed before auth/RBAC: Projects,
+durable Scientific Objects/revisions, and Project file storage. Browser storage
+is still an offline cache, not the source of truth when the core is reachable.
 
 ## Current state
 
 ```text
+Platform Core (Problem-library backend)
+  Project metadata
+  Scientific Object exact envelopes + revisions
+  Project files + hashes
+
 Browser
-  local Project identity
-  local Scientific Objects
+  local Project/Object cache for offline use
   Math computation
   Notebook access to Project results
   Writer draft import from Project results
@@ -18,7 +25,9 @@ Existing app backends
   remain untouched while current consumers still need them
 ```
 
-No `Platform Core` API is required or implemented for this milestone.
+The current core is intentionally anonymous and therefore private-beta only.
+Authentication, ownership isolation, RBAC, quotas and audit trails are the
+next release gate.
 
 ## Server rule for later
 
@@ -89,13 +98,8 @@ Later deletion gate for duplicated solver code:
 
 Current Django `library` backend remains unchanged for legacy Problem Library pages.
 
-Science Hub ecosystem work is browser-local in this milestone:
-
-- local Projects in browser storage;
-- local Scientific Objects in IndexedDB;
-- ecosystem navigation carrying active Project context.
-
-Do not add a new `platform_core` Django app until sync/share/auth is an actual product requirement.
+Science Hub owns the Platform Core API surface and continues to expose the
+legacy Problem Library pages. Keep compute out of this service.
 
 ## Cost rule
 

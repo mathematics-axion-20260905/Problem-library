@@ -11,6 +11,7 @@ import {
   type ScientificProvenance,
 } from "./contracts";
 import { createClientId } from "../client-id";
+import { syncScientificObject } from "./remote-object-store";
 
 const DB_NAME = "axion-science-local-v1";
 const DB_VERSION = 1;
@@ -154,7 +155,7 @@ export async function createLocalScientificObject<TPayload>(input: {
   transaction.objectStore(REVISIONS_STORE).put({ ...revision, key: revisionKey(id, 1) } satisfies StoredRevision<TPayload>);
   await transactionDone(transaction);
   db.close();
-
+  void syncScientificObject(serializeScientificObject(object, [revision])).catch(() => undefined);
   return object;
 }
 
@@ -191,6 +192,7 @@ export async function appendLocalObjectRevision<TPayload>(
   transaction.objectStore(REVISIONS_STORE).put({ ...revision, key: revisionKey(objectId, nextRevision) } satisfies StoredRevision<TPayload>);
   await transactionDone(transaction);
   db.close();
+  void exportLocalScientificObject(objectId).then(syncScientificObject).catch(() => undefined);
   return revision;
 }
 
@@ -300,5 +302,6 @@ export async function importLocalScientificObject<TPayload = unknown>(serialized
   for (const revision of envelope.revisions) transaction.objectStore(REVISIONS_STORE).put({ ...revision, key: revisionKey(revision.objectId, revision.revision) } satisfies StoredRevision<TPayload>);
   await transactionDone(transaction); db.close();
   const current = envelope.revisions.find((revision) => revision.revision === envelope.object.currentRevision) ?? envelope.revisions.at(-1);
+  void syncScientificObject(serialized).catch(() => undefined);
   return current ? { ...envelope.object, revision: current } : envelope.object;
 }
