@@ -65,7 +65,10 @@ dedicated Platform Core is introduced.
 
 The Problem-library backend is the current pre-auth Platform Core. It owns
 Project metadata, Scientific Object metadata/revisions and Project file
-metadata/content. It does not run Math, Notebook Python or simulation jobs.
+metadata/content. Notebook documents and Writer papers keep their Project ID
+in their own backends; the core remains the cross-app source for Project and
+Scientific Object state. It does not run Math, Notebook Python or simulation
+jobs.
 The registry is intentionally anonymous until the auth/RBAC phase, so it is
 appropriate for private beta only.
 

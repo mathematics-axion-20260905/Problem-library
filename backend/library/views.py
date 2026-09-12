@@ -3,7 +3,7 @@ import json
 from datetime import timedelta
 from urllib.parse import quote
 
-from django.db import transaction
+from django.db import connection, transaction
 from django.db.models import Count, Q
 from django.http import FileResponse, JsonResponse
 from django.shortcuts import get_object_or_404
@@ -104,12 +104,17 @@ def overview(request):
             "groups": ProblemGroup.objects.count(),
             "problems": Problem.objects.count(),
             "projects": Project.objects.count(),
+            "scientific_objects": ScientificObject.objects.count(),
+            "project_files": ProjectFile.objects.count(),
         },
         "endpoints": [
             "/api/problem-groups/",
             "/api/problem-groups/stats/",
             "/api/problems/",
             "/api/projects/",
+            "/api/ecosystem/objects/",
+            "/api/ecosystem/files/",
+            "/api/ecosystem/transfers/",
         ],
     }
     return Response(payload)
@@ -117,6 +122,12 @@ def overview(request):
 
 def healthz(request):
     """Small unauthenticated probe for the service manager and load balancer."""
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+    except Exception:
+        return JsonResponse({"status": "unhealthy", "service": "problem-library-backend"}, status=503)
     return JsonResponse({"status": "ok", "service": "problem-library-backend"})
 
 

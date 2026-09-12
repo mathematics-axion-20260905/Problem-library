@@ -19,6 +19,8 @@ Browser
   local Project/Object cache for offline use
   Math computation
   Notebook access to Project results
+  Notebook documents with Project metadata
+  Writer papers with Project metadata
   Writer draft import from Project results
 
 Existing app backends
@@ -73,7 +75,8 @@ Current backend includes Django plus PostgreSQL/Redis-oriented queued execution 
 For this milestone:
 
 - do not expand the queue/worker system;
-- Project results are read locally;
+- Project results are read from the Platform Core and hydrated into the local cache;
+- notebook documents are filtered by their Project metadata when a Project is active;
 - existing server paths remain only for current product behavior.
 
 Future simplification can move ordinary notebook execution toward JupyterLite/Pyodide/Web Workers if real workflows justify it. Remove server execution infrastructure only after every required consumer has another path.
@@ -86,6 +89,7 @@ For this milestone:
 
 - no new solver logic belongs in Writer;
 - local Math results can already start a Writer draft through the Project flow;
+- Writer papers persist their active `project_id` and can be listed by Project;
 - keep existing backend routes that current Writer functionality still needs.
 
 Later deletion gate for duplicated solver code:
