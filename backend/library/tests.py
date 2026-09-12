@@ -11,6 +11,11 @@ class ScientificObjectTransferTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json()["status"], "ok")
 
+    def test_api_overview_probe(self):
+        response = self.client.get("/api/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("scientific_objects", response.json()["models"])
+
     def test_transfer_round_trip_preserves_exact_payload(self):
         payload = json.dumps(
             {

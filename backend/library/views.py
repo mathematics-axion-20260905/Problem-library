@@ -117,7 +117,7 @@ def overview(request):
             "/api/ecosystem/transfers/",
         ],
     }
-    return Response(payload)
+    return JsonResponse(payload)
 
 
 def healthz(request):
