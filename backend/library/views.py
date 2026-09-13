@@ -132,6 +132,7 @@ def healthz(request):
 
 
 MAX_TRANSFER_BYTES = 10 * 1024 * 1024
+MAX_OBJECT_REVISIONS = 1000
 TRANSFER_TTL = timedelta(hours=6)
 
 
@@ -148,6 +149,14 @@ def _parse_scientific_object_payload(payload):
 
     obj = envelope.get("object") if isinstance(envelope, dict) else None
     revisions = envelope.get("revisions") if isinstance(envelope, dict) else None
+    required_text_fields = {
+        "id": 255,
+        "projectId": 255,
+        "kind": 100,
+        "schemaVersion": 50,
+        "title": 500,
+        "sourceApp": 100,
+    }
     if (
         not isinstance(envelope, dict)
         or envelope.get("transferSchemaVersion") != "1.0"
@@ -160,8 +169,16 @@ def _parse_scientific_object_payload(payload):
         or not isinstance(obj.get("schemaVersion"), str)
         or not isinstance(obj.get("title"), str)
         or not isinstance(obj.get("sourceApp"), str)
+        or any(
+            not isinstance(obj.get(field), str)
+            or not obj[field].strip()
+            or len(obj[field]) > max_length
+            for field, max_length in required_text_fields.items()
+        )
         or not isinstance(obj.get("currentRevision"), int)
+        or isinstance(obj["currentRevision"], bool)
         or obj["currentRevision"] < 1
+        or obj["currentRevision"] > MAX_OBJECT_REVISIONS
     ):
         raise ValueError("payload is not a valid Scientific Object transfer envelope")
 
@@ -171,15 +188,20 @@ def _parse_scientific_object_payload(payload):
             not isinstance(revision, dict)
             or revision.get("objectId") != obj["id"]
             or not isinstance(revision.get("revision"), int)
+            or isinstance(revision.get("revision"), bool)
             or revision["revision"] < 1
             or revision["revision"] in revision_numbers
             or not isinstance(revision.get("provenance"), dict)
+            or "payload" not in revision
         ):
             raise ValueError("payload contains invalid Scientific Object revisions")
         revision_numbers.add(revision["revision"])
 
-    if obj["currentRevision"] not in revision_numbers:
-        raise ValueError("payload does not contain the current Scientific Object revision")
+    if (
+        len(revisions) != obj["currentRevision"]
+        or revision_numbers != set(range(1, obj["currentRevision"] + 1))
+    ):
+        raise ValueError("payload must contain every Scientific Object revision from 1 to currentRevision")
 
     return envelope
 
@@ -196,6 +218,7 @@ class ScientificObjectTransferView(APIView):
     """Anonymous short-lived relay used when ecosystem apps have different origins."""
 
     permission_classes = [AllowAny]
+    throttle_scope = "ecosystem_transfer"
 
     def post(self, request):
         try:
@@ -308,6 +331,7 @@ class ScientificObjectRegistryView(APIView):
     """Pre-auth durable Object Registry for cross-server ecosystem storage."""
 
     permission_classes = [AllowAny]
+    throttle_scope = "ecosystem_objects"
 
     def get(self, request, object_id=None):
         if object_id:
@@ -412,6 +436,7 @@ class ScientificObjectRegistryView(APIView):
 
 class ProjectFileView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = "ecosystem_files"
 
     def get(self, request, file_id=None):
         if file_id:
@@ -479,6 +504,7 @@ class ProjectFileView(APIView):
 
 class ProjectFileDownloadView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = "ecosystem_files"
 
     def get(self, request, file_id):
         project_file = get_object_or_404(ProjectFile, public_id=file_id)

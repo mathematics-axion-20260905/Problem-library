@@ -54,6 +54,34 @@ class ScientificObjectTransferTests(APITestCase):
         response = self.client.post("/api/ecosystem/transfers/", {"payload": "{}"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_transfer_rejects_incomplete_revision_history(self):
+        payload = json.dumps(
+            {
+                "transferSchemaVersion": "1.0",
+                "exportedAt": "2026-09-10T00:00:00.000Z",
+                "object": {
+                    "id": "object-incomplete",
+                    "projectId": "project-1",
+                    "kind": "calculation",
+                    "schemaVersion": "1.0",
+                    "title": "Incomplete",
+                    "sourceApp": "math",
+                    "currentRevision": 2,
+                },
+                "revisions": [
+                    {
+                        "objectId": "object-incomplete",
+                        "revision": 2,
+                        "payload": {"value": "42"},
+                        "provenance": {"sourceApp": "math"},
+                    }
+                ],
+            }
+        )
+
+        response = self.client.post("/api/ecosystem/transfers/", {"payload": payload}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_registry_round_trip_preserves_exact_payload_and_is_idempotent(self):
         payload = json.dumps(
             {

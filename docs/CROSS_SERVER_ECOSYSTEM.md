@@ -59,6 +59,8 @@ dedicated Platform Core is introduced.
   import;
 - transfer records expire after six hours and are addressed by an unguessable
   UUID;
+- anonymous core endpoints are throttled and return `no-store` plus
+  `X-Robots-Tag` headers while the pre-auth beta is active;
 - the current relay is anonymous by design for this pre-auth stage. Add
   authentication, authorization, quotas and audit ownership before opening it
   to untrusted public traffic.
