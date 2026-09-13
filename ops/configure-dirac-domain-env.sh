@@ -46,6 +46,7 @@ for env_file in /root/projects/Notebook/backend/.env /root/projects/Writer/backe
     replace_or_add "$env_file" DJANGO_ALLOWED_HOSTS "$allowed_hosts"
     replace_or_add "$env_file" DJANGO_CORS_ALLOWED_ORIGINS "$browser_origins"
     replace_or_add "$env_file" DJANGO_CSRF_TRUSTED_ORIGINS "$browser_origins"
+    replace_or_add "$env_file" DJANGO_SECURE_SSL_REDIRECT true
 done
 
 echo "Domain environment configured"
