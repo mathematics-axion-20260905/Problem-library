@@ -33,7 +33,6 @@ export function Navbar() {
           <nav className="hidden items-center gap-1 xl:flex" aria-label="Science Hub product">
             <Link href="/#product" className="ax-premium-nav-link">Product</Link>
             <Link href="/#workflow" className="ax-premium-nav-link">Workflow</Link>
-            <Link href="/#capabilities" className="ax-premium-nav-link">Capabilities</Link>
             <Link href="/#ecosystem" className="ax-premium-nav-link">Ecosystem</Link>
           </nav>
         ) : (

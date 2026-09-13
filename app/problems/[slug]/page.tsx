@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   CalculationSection,
@@ -16,6 +18,20 @@ export function generateStaticParams() {
   return [{ slug: ledDesignProblem.meta.slug }];
 }
 
+export function generateMetadata(): Metadata {
+  return {
+    title: `${ledDesignProblem.meta.title} engineering case study`,
+    description: ledDesignProblem.meta.subtitle,
+    alternates: { canonical: `/problems/${ledDesignProblem.meta.slug}` },
+    openGraph: {
+      type: "article",
+      title: `${ledDesignProblem.meta.title} engineering case study`,
+      description: ledDesignProblem.meta.subtitle,
+      url: `/problems/${ledDesignProblem.meta.slug}`,
+    },
+  };
+}
+
 export default async function ProblemPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
@@ -30,7 +46,7 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
               <div className="ax-work-kicker">Scientific case file</div>
               <div className="mt-1 text-[10px] text-[var(--ax-text-faint)]">Model · constraints · calculation · evidence · provenance</div>
             </div>
-            <a href="/problems" className="text-[10px] font-semibold text-[var(--ax-accent)] hover:text-[var(--ax-accent-strong)]">Problem library →</a>
+            <Link href="/problems" className="text-[10px] font-semibold text-[var(--ax-accent)] hover:text-[var(--ax-accent-strong)]">Problem library →</Link>
           </div>
 
           <div className="ax-problem-sections grid gap-5 lg:gap-6">
