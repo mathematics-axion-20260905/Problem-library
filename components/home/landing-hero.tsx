@@ -1,15 +1,37 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, BookOpenText, FileText, FlaskConical, Sigma } from "lucide-react";
 
 import { ScienceHeroScene } from "@/components/home/science-hero-scene";
+import { useLocale } from "@/components/locale-provider";
 
-const promises = [
+const scienceLandingCopy = {
+  en: {
+    heroKicker: "Axion Science · one project, many instruments", heroTitle: ["Science,", "kept", "connected."], heroLead: "Move from computation to reasoning to publication without rebuilding context every time the scientific instrument changes.", start: "Start a Project", see: "See how it works",
+    productKicker: "The Project", productTitle: "One research context across every scientific instrument.", productCopy: "The Project is the user-facing home. Calculations, reasoning, figures and documents remain separate objects but share one scientific trail.", previewTitle: "Turbulence Study", previewCopy: "A connected trail from model to publication.",
+    workflowKicker: "Research lifecycle", workflowTitle: "From a question to a publication without the broken handoffs.", workflowCopy: "Each stage uses a focused instrument. The Project keeps the scientific context connected while the work moves forward.",
+    ecosystemKicker: "Focused instruments, one system", ecosystemTitle: "Compute. Reason. Publish. Keep the chain intact.", ecosystemCopy: "The products stay specialized because the shared Project and Scientific Object contracts carry context between them.", ecosystemItems: [["Mathematics", "Solve, visualize and preserve scientific results."], ["Notebook", "Keep reasoning, observations and findings beside the evidence."], ["Writer", "Turn the same evidence into a publication-ready document."]],
+    finalTitle: ["Scientific work should stay", "connected."], finalCopy: "Start a Project locally, open the instrument you need, and keep the research trail intact from computation to publication.",
+  },
+  uz: {
+    heroKicker: "Axion Science · bitta loyiha, ko‘p asbob", heroTitle: ["Ilmiy ish,", "bir-biriga", "bog‘langan."], heroLead: "Ilmiy asbob almashganda kontekstni qayta qurmasdan hisoblashdan fikrlashga, undan nashrga o‘ting.", start: "Loyiha boshlash", see: "Qanday ishlashini ko‘rish",
+    productKicker: "Loyiha", productTitle: "Har bir ilmiy asbob uchun bitta tadqiqot konteksti.", productCopy: "Loyiha foydalanuvchi ko‘radigan asosiy makon. Hisoblashlar, fikrlash, grafiklar va hujjatlar alohida obyekt bo‘lib qoladi, ammo bitta ilmiy izni bo‘lishadi.", previewTitle: "Turbulentlik tadqiqoti", previewCopy: "Modeldan nashrgacha bog‘langan iz.",
+    workflowKicker: "Tadqiqot hayotiy sikli", workflowTitle: "Savoldan nashrgacha — uzilib qoladigan ko‘priklarsiz.", workflowCopy: "Har bir bosqich o‘z asbobidan foydalanadi. Loyiha ish oldinga siljiganda ilmiy kontekstni bog‘lab turadi.",
+    ecosystemKicker: "Bir tizimdagi ilmiy asboblar", ecosystemTitle: "Hisobla. Fikrlang. Nashr qiling. Zanjirni saqlang.", ecosystemCopy: "Mahsulotlar ixtisoslashgan bo‘lib qoladi, umumiy Loyiha va Scientific Object shartnomalari esa kontekstni ular orasida olib o‘tadi.", ecosystemItems: [["Matematika", "Ilmiy natijalarni hisoblang, ko‘rsating va saqlang."], ["Notebook", "Fikrlash va kuzatuvlarni dalil yonida saqlang."], ["Writer", "O‘sha dalillarni nashrga tayyor hujjatga aylantiring."]],
+    finalTitle: ["Ilmiy ish", "bog‘langan"], finalCopy: "Loyihani mahalliy boshlang, kerakli asbobni oching va hisoblashdan nashrgacha tadqiqot izini saqlang.",
+  },
+} as const;
+
+type ScienceLandingCopy = (typeof scienceLandingCopy)[keyof typeof scienceLandingCopy];
+
+const defaultPromises = [
   ["Compute", "Use focused scientific instruments without losing the Project that gives the work meaning."],
   ["Reason", "Keep models, observations and findings attached to the evidence that produced them."],
   ["Publish", "Carry the same scientific context into a document instead of rebuilding it at the end."],
 ];
 
-const workflow = [
+const defaultWorkflow = [
   ["01", "Question", "Start with the research problem and the context around it."],
   ["02", "Model", "State assumptions, equations and the structure of the investigation."],
   ["03", "Math", "Compute, visualize and save reusable scientific results."],
@@ -17,7 +39,7 @@ const workflow = [
   ["05", "Writer", "Turn the evidence into a publication without breaking the chain."],
 ];
 
-function ProjectPreview() {
+function ProjectPreview({ copy }: { copy: ScienceLandingCopy }) {
   return (
     <div className="ax-product-frame">
       <div className="flex h-11 items-center justify-between border-b border-[var(--ax-line)] px-5"><span className="ax-figure-label">Fig 01 · Project workspace</span><span className="text-[10px] font-semibold text-[var(--ax-accent)]">Local · active</span></div>
@@ -30,7 +52,7 @@ function ProjectPreview() {
 
         <div className="p-5 sm:p-8 lg:p-10">
           <div className="flex flex-col gap-4 border-b border-[var(--ax-line)] pb-7 sm:flex-row sm:items-end sm:justify-between">
-            <div><p className="ax-figure-label text-[var(--ax-accent)]">Research project</p><h3 className="mt-2 font-[family-name:var(--ax-font-display)] text-[clamp(32px,4vw,48px)] tracking-[-0.045em]">Turbulence Study</h3><p className="mt-2 text-[12px] text-[var(--ax-text-soft)]">A connected trail from model to publication.</p></div>
+            <div><p className="ax-figure-label text-[var(--ax-accent)]">{copy.productKicker}</p><h3 className="mt-2 font-[family-name:var(--ax-font-display)] text-[clamp(32px,4vw,48px)] tracking-[-0.045em]">{copy.previewTitle}</h3><p className="mt-2 text-[12px] text-[var(--ax-text-soft)]">{copy.previewCopy}</p></div>
             <div className="text-[10px] font-semibold text-[var(--ax-text-faint)]">5 objects · 3 instruments</div>
           </div>
 
@@ -56,19 +78,23 @@ function ProjectPreview() {
 }
 
 export function LandingHero() {
+  const { locale } = useLocale();
+  const copy = scienceLandingCopy[locale];
+  const promises = locale === "uz" ? [["Hisobla", "Loyihaning mazmunini yo‘qotmasdan kerakli ilmiy asboblardan foydalaning."], ["Fikrlang", "Model, kuzatuv va xulosalarni ularni yaratgan dalil bilan bog‘lab saqlang."], ["Nashr qiling", "Ilmiy kontekstni oxirida qayta tiklamasdan hujjatga olib o‘ting."]] : defaultPromises;
+  const workflow = locale === "uz" ? [["01", "Savol", "Tadqiqot muammosi va uning kontekstidan boshlang."], ["02", "Model", "Farazlar, tenglamalar va tadqiqot tuzilmasini belgilang."], ["03", "Math", "Qayta ishlatiladigan ilmiy natijalarni hisoblang, ko‘rsating va saqlang."], ["04", "Notebook", "Fikrlash, kuzatuv va xulosalarni bitta izda saqlang."], ["05", "Writer", "Zanjirni buzmasdan dalillarni nashrga tayyor hujjatga aylantiring."]] : defaultWorkflow;
   return (
     <div className="ax-landing">
-      <div className="ax-landing-container"><section className="ax-landing-hero"><div className="ax-hero-copy"><p className="ax-landing-kicker">Axion Science · one project, many instruments</p><h1 className="ax-landing-display">Science,<br/>kept <span className="italic">connected.</span></h1><div className="ax-signature-rule" aria-hidden="true"/><p className="ax-landing-lead">Move from computation to reasoning to publication without rebuilding context every time the scientific instrument changes.</p><div className="mt-8 flex flex-wrap gap-2"><Link href="/projects" className="ax-premium-primary">Start a Project <ArrowRight className="h-4 w-4"/></Link><Link href="#product" className="ax-premium-secondary">See how it works <ArrowRight className="h-3.5 w-3.5 text-[var(--ax-text-faint)]"/></Link></div></div><div className="ax-hero-visual"><ScienceHeroScene/></div></section></div>
+      <div className="ax-landing-container"><section className="ax-landing-hero"><div className="ax-hero-copy"><p className="ax-landing-kicker">{copy.heroKicker}</p><h1 className="ax-landing-display">{copy.heroTitle[0]}<br/>{copy.heroTitle[1]} <span className="italic">{copy.heroTitle[2]}</span></h1><div className="ax-signature-rule" aria-hidden="true"/><p className="ax-landing-lead">{copy.heroLead}</p><div className="mt-8 flex flex-wrap gap-2"><Link href="/projects" className="ax-premium-primary">{copy.start} <ArrowRight className="h-4 w-4"/></Link><Link href="#product" className="ax-premium-secondary">{copy.see} <ArrowRight className="h-3.5 w-3.5 text-[var(--ax-text-faint)]"/></Link></div></div><div className="ax-hero-visual"><ScienceHeroScene/></div></section></div>
 
       <section className="ax-promise-strip"><div className="ax-landing-container ax-promise-grid">{promises.map(([title,copy])=><div key={title} className="ax-promise-item"><div className="ax-promise-title">{title}</div><p className="ax-promise-copy">{copy}</p></div>)}</div></section>
 
-      <section id="product" className="ax-landing-section"><div className="ax-landing-container"><div className="ax-section-head"><div><p className="ax-landing-kicker">The Project</p><h2 className="ax-section-title">One research context across every scientific instrument.</h2></div><p className="ax-section-copy">The Project is the user-facing home. Calculations, reasoning, figures and documents remain separate objects but share one scientific trail.</p></div><ProjectPreview/></div></section>
+      <section id="product" className="ax-landing-section"><div className="ax-landing-container"><div className="ax-section-head"><div><p className="ax-landing-kicker">{copy.productKicker}</p><h2 className="ax-section-title">{copy.productTitle}</h2></div><p className="ax-section-copy">{copy.productCopy}</p></div><ProjectPreview copy={copy}/></div></section>
 
-      <section id="workflow" className="ax-landing-section ax-landing-section-alt"><div className="ax-landing-container"><div className="ax-section-head"><div><p className="ax-landing-kicker">Research lifecycle</p><h2 className="ax-section-title">From a question to a publication without the broken handoffs.</h2></div><p className="ax-section-copy">Each stage uses a focused instrument. The Project keeps the scientific context connected while the work moves forward.</p></div><div className="ax-editorial-list">{workflow.map(([index,title,copy])=><div key={index} className="ax-editorial-row"><div className="ax-editorial-index">{index}</div><div className="ax-editorial-title">{title}</div><p className="ax-editorial-copy">{copy}</p></div>)}</div></div></section>
+      <section id="workflow" className="ax-landing-section ax-landing-section-alt"><div className="ax-landing-container"><div className="ax-section-head"><div><p className="ax-landing-kicker">{copy.workflowKicker}</p><h2 className="ax-section-title">{copy.workflowTitle}</h2></div><p className="ax-section-copy">{copy.workflowCopy}</p></div><div className="ax-editorial-list">{workflow.map(([index,title, text])=><div key={index} className="ax-editorial-row"><div className="ax-editorial-index">{index}</div><div className="ax-editorial-title">{title}</div><p className="ax-editorial-copy">{text}</p></div>)}</div></div></section>
 
-      <section id="ecosystem" className="ax-landing-section ax-landing-section-alt"><div className="ax-landing-container"><div className="ax-section-head"><div><p className="ax-landing-kicker">Focused instruments, one system</p><h2 className="ax-section-title">Compute. Reason. Publish. Keep the chain intact.</h2></div><p className="ax-section-copy">The products stay specialized because the shared Project and Scientific Object contracts carry context between them.</p></div><div className="mt-14 grid gap-3 lg:grid-cols-3">{[{icon:Sigma,title:'Mathematics',copy:'Solve, visualize and preserve scientific results.'},{icon:BookOpenText,title:'Notebook',copy:'Keep reasoning, observations and findings beside the evidence.'},{icon:FileText,title:'Writer',copy:'Turn the same evidence into a publication-ready document.'}].map(({icon:Icon,title,copy},index)=><div key={title} className="relative border-t border-[var(--ax-line)] py-7 lg:px-7 lg:first:pl-0"><div className="flex items-center gap-3"><Icon className="h-4 w-4 text-[var(--ax-accent)]"/><span className="font-[family-name:var(--ax-font-display)] text-[25px]">{title}</span></div><p className="mt-3 max-w-sm text-[13px] leading-6 text-[var(--ax-text-soft)]">{copy}</p>{index<2?<ArrowRight className="absolute right-2 top-9 hidden h-4 w-4 text-[var(--ax-text-faint)] lg:block"/>:null}</div>)}</div></div></section>
+      <section id="ecosystem" className="ax-landing-section ax-landing-section-alt"><div className="ax-landing-container"><div className="ax-section-head"><div><p className="ax-landing-kicker">{copy.ecosystemKicker}</p><h2 className="ax-section-title">{copy.ecosystemTitle}</h2></div><p className="ax-section-copy">{copy.ecosystemCopy}</p></div><div className="mt-14 grid gap-3 lg:grid-cols-3">{[Sigma, BookOpenText, FileText].map((Icon,index)=><div key={copy.ecosystemItems[index][0]} className="relative border-t border-[var(--ax-line)] py-7 lg:px-7 lg:first:pl-0"><div className="flex items-center gap-3"><Icon className="h-4 w-4 text-[var(--ax-accent)]"/><span className="font-[family-name:var(--ax-font-display)] text-[25px]">{copy.ecosystemItems[index][0]}</span></div><p className="mt-3 max-w-sm text-[13px] leading-6 text-[var(--ax-text-soft)]">{copy.ecosystemItems[index][1]}</p>{index<2?<ArrowRight className="absolute right-2 top-9 hidden h-4 w-4 text-[var(--ax-text-faint)] lg:block"/>:null}</div>)}</div></div></section>
 
-      <section className="ax-final-cta"><div className="ax-landing-container"><FlaskConical className="mx-auto mb-6 h-5 w-5 text-[var(--ax-accent)]"/><h2 className="ax-final-title">Scientific work should stay <span className="italic">connected.</span></h2><p className="ax-final-copy">Start a Project locally, open the instrument you need, and keep the research trail intact from computation to publication.</p><Link href="/projects" className="ax-premium-primary mt-8">Start a Project <ArrowRight className="h-4 w-4"/></Link></div></section>
+      <section className="ax-final-cta"><div className="ax-landing-container"><FlaskConical className="mx-auto mb-6 h-5 w-5 text-[var(--ax-accent)]"/><h2 className="ax-final-title">{copy.finalTitle[0]} <span className="italic">{copy.finalTitle[1]}</span></h2><p className="ax-final-copy">{copy.finalCopy}</p><Link href="/projects" className="ax-premium-primary mt-8">{copy.start} <ArrowRight className="h-4 w-4"/></Link></div></section>
     </div>
   );
 }

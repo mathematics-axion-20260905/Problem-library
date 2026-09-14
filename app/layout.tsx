@@ -9,6 +9,7 @@ import "@/styles/axion-ecosystem-shell.css";
 import "@/styles/axion-premium-landing.css";
 import "@/styles/axion-premium-workspace.css";
 import { siteJsonLd, siteMetadata } from "@/lib/seo";
+import { LocaleProvider } from "@/components/locale-provider";
 
 const bodyFont = Manrope({ variable: "--font-body", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -18,17 +19,19 @@ export const metadata: Metadata = siteMetadata;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="uz">
+    <html lang="en">
       <head>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }} />
       </head>
       <body className={`${bodyFont.variable} ${displayFont.variable} ${geistMono.variable} antialiased`}>
-        <div className="relative flex min-h-screen flex-col">
-          <EcosystemBar currentApp="science" />
-          <Navbar />
-          <div className="flex-1">{children}</div>
-          <Footer />
-        </div>
+        <LocaleProvider>
+          <div className="relative flex min-h-screen flex-col">
+            <EcosystemBar currentApp="science" />
+            <Navbar />
+            <div className="flex-1">{children}</div>
+            <Footer />
+          </div>
+        </LocaleProvider>
       </body>
     </html>
   );
