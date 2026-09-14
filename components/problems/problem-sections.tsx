@@ -11,12 +11,24 @@ import type {
 import { Badge } from "@/components/ui/primitives";
 import { SectionFrame, SectionHeading } from "@/components/ui/section";
 import { ui } from "@/components/ui/styles";
+import { useLocale } from "@/components/locale-provider";
+
+const detailCopy = {
+  en: {
+    file: "Problem file", overview: "Overview", origin: "Origin", impact: "Impact", quick: "Quick summary", difficulty: "Difficulty", readTime: "Read time", outcome: "Outcome", why: "Why it matters", context: "Context", contextTitle: "Learning objective and operating context", contextDescription: "This section fixes the target outcome and the practical scenario before moving into formulas and calculations.", learning: "Learning objective", provenance: "Provenance", sourceModel: "Source model", provenanceDescription: "Each content type is tied back to what it is supposed to prove or explain.", formulaSource: "Formula source", codePurpose: "Code purpose", graphMeaning: "Graph meaning", constraints: "Constraints", engineering: "Engineering constraints", constraintsDescription: "Non-negotiable limits that shape the design and validation path.", formulaSet: "Formula set", formulaDefinitions: "Formula definitions", formulaDescription: "Definitions are shown as compact technical records rather than decorative cards.", interpretation: "Interpretation", useCase: "Use case", calculationPath: "Calculation path", calculations: "Worked calculations", calculationDescription: "Each worked block isolates inputs, formula, and output so review is faster.", calculation: "Calculation", output: "Output", dataView: "Data view", automation: "Automation", referenceCode: "Reference code", codeDescription: "Code is presented as a working technical artifact rather than a showcase block.", summary: "Summary", conclusions: "Conclusions and next steps", notesDescription: "Final notes are listed as operational takeaways."
+  },
+  uz: {
+    file: "Masala fayli", overview: "Umumiy ko‘rinish", origin: "Kelib chiqishi", impact: "Ta’siri", quick: "Qisqa xulosa", difficulty: "Murakkablik", readTime: "O‘qish vaqti", outcome: "Kutilgan natija", why: "Ahamiyati", context: "Kontekst", contextTitle: "Maqsad va amaliy kontekst", contextDescription: "Bu bo‘lim formula va hisoblashlarga o‘tishdan oldin kutilgan natija hamda amaliy vaziyatni belgilaydi.", learning: "O‘quv maqsadi", provenance: "Kelib chiqish ma’lumoti", sourceModel: "Manba modeli", provenanceDescription: "Har bir kontent turi nimani isbotlashi yoki tushuntirishi kerakligi bilan bog‘langan.", formulaSource: "Formula manbasi", codePurpose: "Kod maqsadi", graphMeaning: "Grafik ma’nosi", constraints: "Cheklovlar", engineering: "Muhandislik cheklovlari", constraintsDescription: "Loyiha va tekshiruv yo‘lini belgilaydigan majburiy chegaralar.", formulaSet: "Formulalar to‘plami", formulaDefinitions: "Formula ta’riflari", formulaDescription: "Ta’riflar bezakli kartalar emas, ixcham texnik qaydlar sifatida ko‘rsatiladi.", interpretation: "Talqin", useCase: "Foydalanish holati", calculationPath: "Hisoblash yo‘li", calculations: "Bosqichma-bosqich hisoblash", calculationDescription: "Har bir blok kiritma, formula va chiqishni alohida ko‘rsatadi, shu sababli tekshiruv tezlashadi.", calculation: "Hisoblash", output: "Chiqish", dataView: "Ma’lumotlar ko‘rinishi", automation: "Avtomatlashtirish", referenceCode: "Namunaviy kod", codeDescription: "Kod namoyish bloki emas, ishlaydigan texnik obyekt sifatida taqdim etiladi.", summary: "Xulosa", conclusions: "Xulosalar va keyingi qadamlar", notesDescription: "Yakuniy qaydlar amaliy xulosalar sifatida beriladi."
+  }
+} as const;
 
 export function ProblemNarrative({ problem }: { problem: ProblemModule }) {
+  const { locale } = useLocale();
+  const copy = detailCopy[locale];
   return (
     <section className="border border-[var(--color-line)] bg-[var(--color-surface)]">
       <div className="border-b border-[var(--color-line)] px-4 py-3 sm:px-5">
-        <p className={ui.overline}>Problem file</p>
+        <p className={ui.overline}>{copy.file}</p>
       </div>
 
       <div className="grid gap-4 px-4 py-4 sm:px-5 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -37,21 +49,21 @@ export function ProblemNarrative({ problem }: { problem: ProblemModule }) {
           </div>
 
           <div className="grid gap-3 border-t border-[var(--color-line-soft)] pt-4 lg:grid-cols-3">
-            <InfoBlock label="Overview" text={problem.story.overview} />
-            <InfoBlock label="Origin" text={problem.story.origin} />
-            <InfoBlock label="Impact" text={problem.story.impact} />
+            <InfoBlock label={copy.overview} text={problem.story.overview} />
+            <InfoBlock label={copy.origin} text={problem.story.origin} />
+            <InfoBlock label={copy.impact} text={problem.story.impact} />
           </div>
         </div>
 
         <aside className="border border-[var(--color-line-soft)] bg-[var(--color-surface-soft)]">
           <div className="border-b border-[var(--color-line-soft)] px-4 py-3">
-            <p className={ui.caption}>Quick summary</p>
+            <p className={ui.caption}>{copy.quick}</p>
           </div>
           <div className="grid gap-0">
-            <MetricRow label="Difficulty" value={problem.meta.difficulty} />
-            <MetricRow label="Read time" value={problem.meta.estimatedTime} />
-            <MetricRow label="Outcome" value={problem.meta.outcome} />
-            <MetricRow label="Why it matters" value={problem.story.whyItMatters} multiline />
+            <MetricRow label={copy.difficulty} value={problem.meta.difficulty} />
+            <MetricRow label={copy.readTime} value={problem.meta.estimatedTime} />
+            <MetricRow label={copy.outcome} value={problem.meta.outcome} />
+            <MetricRow label={copy.why} value={problem.story.whyItMatters} multiline />
           </div>
         </aside>
       </div>
@@ -60,45 +72,51 @@ export function ProblemNarrative({ problem }: { problem: ProblemModule }) {
 }
 
 export function ProblemStory({ problem }: { problem: ProblemModule }) {
+  const { locale } = useLocale();
+  const copy = detailCopy[locale];
   return (
     <SectionFrame className="p-4 sm:p-5">
       <SectionHeading
-        eyebrow="Context"
-        title="Learning objective and operating context"
-        description="This section fixes the target outcome and the practical scenario before moving into formulas and calculations."
+        eyebrow={copy.context}
+        title={copy.contextTitle}
+        description={copy.contextDescription}
       />
       <div className="mt-4 grid gap-3 lg:grid-cols-2">
-        <InfoBlock label="Learning objective" text={problem.meta.outcome} />
-        <InfoBlock label="Context" text={problem.story.origin} />
+        <InfoBlock label={copy.learning} text={problem.meta.outcome} />
+        <InfoBlock label={copy.context} text={problem.story.origin} />
       </div>
     </SectionFrame>
   );
 }
 
 export function ProvenanceSection({ problem }: { problem: ProblemModule }) {
+  const { locale } = useLocale();
+  const copy = detailCopy[locale];
   return (
     <SectionFrame className="p-4 sm:p-5">
       <SectionHeading
-        eyebrow="Provenance"
-        title="Source model"
-        description="Each content type is tied back to what it is supposed to prove or explain."
+        eyebrow={copy.provenance}
+        title={copy.sourceModel}
+        description={copy.provenanceDescription}
       />
       <div className="mt-4 grid gap-3 lg:grid-cols-3">
-        <InfoBlock label="Formula source" text={problem.provenance.formulaSource} />
-        <InfoBlock label="Code purpose" text={problem.provenance.codePurpose} />
-        <InfoBlock label="Graph meaning" text={problem.provenance.graphMeaning} />
+        <InfoBlock label={copy.formulaSource} text={problem.provenance.formulaSource} />
+        <InfoBlock label={copy.codePurpose} text={problem.provenance.codePurpose} />
+        <InfoBlock label={copy.graphMeaning} text={problem.provenance.graphMeaning} />
       </div>
     </SectionFrame>
   );
 }
 
 export function ConstraintList({ constraints }: { constraints: string[] }) {
+  const { locale } = useLocale();
+  const copy = detailCopy[locale];
   return (
     <SectionFrame className="p-4 sm:p-5">
       <SectionHeading
-        eyebrow="Constraints"
-        title="Engineering constraints"
-        description="Non-negotiable limits that shape the design and validation path."
+        eyebrow={copy.constraints}
+        title={copy.engineering}
+        description={copy.constraintsDescription}
       />
       <div className="mt-4 overflow-hidden border border-[var(--color-line-soft)]">
         {constraints.map((constraint, index) => (
@@ -118,12 +136,14 @@ export function ConstraintList({ constraints }: { constraints: string[] }) {
 }
 
 export function FormulaSection({ formulas }: { formulas: FormulaEntry[] }) {
+  const { locale } = useLocale();
+  const copy = detailCopy[locale];
   return (
     <SectionFrame className="p-4 sm:p-5">
       <SectionHeading
-        eyebrow="Formula set"
-        title="Formula definitions"
-        description="Definitions are shown as compact technical records rather than decorative cards."
+        eyebrow={copy.formulaSet}
+        title={copy.formulaDefinitions}
+        description={copy.formulaDescription}
       />
       <div className="mt-4 grid gap-3">
         {formulas.map((item) => (
@@ -137,11 +157,11 @@ export function FormulaSection({ formulas }: { formulas: FormulaEntry[] }) {
               <div>
                 <p className="text-sm leading-6 text-[var(--color-muted)]">{item.meaning}</p>
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                  <TextPair label="Origin" text={item.origin} />
-                  <TextPair label="Interpretation" text={item.interpretation} />
+                  <TextPair label={copy.origin} text={item.origin} />
+                  <TextPair label={copy.interpretation} text={item.interpretation} />
                 </div>
               </div>
-              <TextPair label="Use case" text={item.useCase} />
+              <TextPair label={copy.useCase} text={item.useCase} />
             </div>
           </article>
         ))}
@@ -155,12 +175,14 @@ export function CalculationSection({
 }: {
   calculations: CalculationEntry[];
 }) {
+  const { locale } = useLocale();
+  const copy = detailCopy[locale];
   return (
     <SectionFrame className="p-4 sm:p-5">
       <SectionHeading
-        eyebrow="Calculation path"
-        title="Worked calculations"
-        description="Each worked block isolates inputs, formula, and output so review is faster."
+        eyebrow={copy.calculationPath}
+        title={copy.calculations}
+        description={copy.calculationDescription}
       />
       <div className="mt-4 grid gap-3">
         {calculations.map((item) => (
@@ -168,7 +190,7 @@ export function CalculationSection({
             <div className="grid gap-4 px-4 py-4 lg:grid-cols-[minmax(0,1fr)_240px]">
               <div className="space-y-4">
                 <div>
-                  <p className={ui.caption}>Calculation</p>
+                  <p className={ui.caption}>{copy.calculation}</p>
                   <h3 className="mt-2 text-lg font-semibold tracking-[-0.02em] text-[var(--color-text-strong)]">
                     {item.title}
                   </h3>
@@ -200,7 +222,7 @@ export function CalculationSection({
 
               <div className="border border-[var(--color-line-soft)] bg-[#0f172a] px-4 py-4 text-white">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/60">
-                  Output
+                  {copy.output}
                 </p>
                 <p className="mt-3 text-2xl font-semibold tracking-[-0.04em]">{item.result}</p>
                 <p className="mt-3 text-sm leading-6 text-white/72">{item.note}</p>
@@ -226,6 +248,8 @@ export function GraphSection({
   yLabel: string;
   series: GraphSeries[];
 }) {
+  const { locale } = useLocale();
+  const copy = detailCopy[locale];
   const minX = Math.min(...series.flatMap((item) => item.points.map((point) => point.x)));
   const maxX = Math.max(...series.flatMap((item) => item.points.map((point) => point.x)));
   const minY = Math.min(...series.flatMap((item) => item.points.map((point) => point.y)));
@@ -241,7 +265,7 @@ export function GraphSection({
 
   return (
     <SectionFrame className="p-4 sm:p-5">
-      <SectionHeading eyebrow="Data view" title={title} description={description} />
+      <SectionHeading eyebrow={copy.dataView} title={title} description={description} />
       <div className="mt-4 border border-[var(--color-line-soft)] bg-white p-3">
         <svg viewBox={`0 0 ${width} ${height}`} className="h-auto w-full">
           <line x1={pad} y1={height - pad} x2={width - pad} y2={height - pad} stroke="#94a3b8" />
@@ -289,15 +313,17 @@ export function GraphSection({
 }
 
 export function CodeSection({ samples }: { samples: CodeSample[] }) {
+  const { locale } = useLocale();
+  const copy = detailCopy[locale];
   const [activeIndex, setActiveIndex] = useState(0);
   const activeSample = samples[activeIndex] ?? samples[0];
 
   return (
     <SectionFrame className="p-4 sm:p-5">
       <SectionHeading
-        eyebrow="Automation"
-        title="Reference code"
-        description="Code is presented as a working technical artifact rather than a showcase block."
+        eyebrow={copy.automation}
+        title={copy.referenceCode}
+        description={copy.codeDescription}
       />
       <div className="mt-4 flex flex-wrap gap-2">
         {samples.map((sample, index) => (
@@ -328,7 +354,7 @@ export function CodeSection({ samples }: { samples: CodeSample[] }) {
 
           <div className="border border-white/10 bg-white/5 p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/60">
-              Output
+              {copy.output}
             </p>
             <pre className="mt-3 whitespace-pre-wrap font-mono text-sm leading-6 text-emerald-200">
               {activeSample.output}
@@ -341,12 +367,14 @@ export function CodeSection({ samples }: { samples: CodeSample[] }) {
 }
 
 export function NotesSection({ notes }: { notes: string[] }) {
+  const { locale } = useLocale();
+  const copy = detailCopy[locale];
   return (
     <SectionFrame className="p-4 sm:p-5">
       <SectionHeading
-        eyebrow="Summary"
-        title="Conclusions and next steps"
-        description="Final notes are listed as operational takeaways."
+        eyebrow={copy.summary}
+        title={copy.conclusions}
+        description={copy.notesDescription}
       />
       <div className="mt-4 overflow-hidden border border-[var(--color-line-soft)]">
         {notes.map((note, index) => (

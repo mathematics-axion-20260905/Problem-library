@@ -6,9 +6,14 @@ import { allProblems } from "@/app/data";
 import { ProjectCreateModal } from "@/components/library/project-create-modal";
 import { ProblemDetailCard } from "@/components/problems/problem-detail-card";
 import { fetchLibraryApi } from "@/lib/api";
+import { useLocale } from "@/components/locale-provider";
 
 export default function ProblemsPage() {
   const router = useRouter();
+  const { locale } = useLocale();
+  const copy = locale === "uz"
+    ? { kicker: "Ilmiy kutubxona", title: "Tahlil uchun texnik masalalar.", lead: "Masalalarni mavzu va murakkablik bo‘yicha ko‘rib chiqing, keraklisini Loyiha sifatida saqlang va ishni ilmiy asboblarda davom ettiring.", create: "Loyiha yaratish", search: "Izlash", placeholder: "Sarlavha, mavzu, murakkablik, teg", sortTitle: "Saralash · sarlavha", sortTopic: "Saralash · mavzu", sortDifficulty: "Saralash · murakkablik", results: "natija", cases: "Masalalar", library: "Texnik masalalar kutubxonasi", dimensions: "Mavzu · murakkablik · davomiylik · teglar", createFailed: "Yaratib bo‘lmadi", success: "Loyiha yaratildi.", offline: "Backend bilan aloqa o‘rnatilmadi. Problem Library API sozlamalarini tekshiring." }
+    : { kicker: "Scientific library", title: "Technical problems for analysis.", lead: "Browse problems by topic and difficulty, save useful cases as a Project, and continue the work in the scientific instruments.", create: "Create project", search: "Search", placeholder: "Title, topic, difficulty, tag", sortTitle: "Sort · Title", sortTopic: "Sort · Topic", sortDifficulty: "Sort · Difficulty", results: "results", cases: "Cases", library: "Technical problem library", dimensions: "Topic · difficulty · duration · tags", createFailed: "Create failed", success: "Project created.", offline: "Backend connection failed. Check the configured Problem Library API." };
   const [open, setOpen] = useState(() => {
     if (typeof window === "undefined") return false;
     return new URLSearchParams(window.location.search).get("create") === "1";
@@ -60,12 +65,12 @@ export default function ProblemsPage() {
         }),
       });
 
-      if (!response.ok) throw new Error("Create failed");
-      setMessage("Project created.");
+      if (!response.ok) throw new Error(copy.createFailed);
+      setMessage(copy.success);
       setForm({ title: "", topic: "", difficulty: "Medium", description: "" });
       setOpen(false);
     } catch {
-      setMessage("Backend connection failed. Check the configured Problem Library API.");
+      setMessage(copy.offline);
     } finally {
       setSaving(false);
     }
@@ -76,34 +81,34 @@ export default function ProblemsPage() {
       <main className="ax-work-container">
         <section className="ax-work-pagehead">
           <div>
-            <p className="ax-work-kicker">Scientific library</p>
-            <h1 className="ax-work-title">Problems worth exploring.</h1>
-            <p className="ax-work-lead">Browse technical cases by topic and difficulty, then turn the useful ones into a Project and continue the work in the scientific instruments.</p>
+            <p className="ax-work-kicker">{copy.kicker}</p>
+            <h1 className="ax-work-title">{copy.title}</h1>
+            <p className="ax-work-lead">{copy.lead}</p>
             <div className="mt-7">
               <button type="button" className="inline-flex h-10 items-center rounded-[var(--ax-work-control-radius)] bg-[var(--ax-accent-strong)] px-4 text-[11px] font-semibold text-white hover:bg-[var(--ax-accent)]" onClick={() => setOpen(true)}>
-                Create project
+                {copy.create}
               </button>
             </div>
           </div>
           <div className="space-y-4">
             <div>
-              <label htmlFor="problem-search" className="ax-work-kicker text-[var(--ax-text-faint)]">Search</label>
+              <label htmlFor="problem-search" className="ax-work-kicker text-[var(--ax-text-faint)]">{copy.search}</label>
               <input
                 id="problem-search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Title, topic, difficulty, tag"
+                placeholder={copy.placeholder}
                 className="ax-work-input mt-2 h-11 w-full px-3 text-sm"
               />
             </div>
             <div className="grid grid-cols-[minmax(0,1fr)_110px] gap-3">
               <select id="problem-sort" value={sortBy} onChange={(event) => setSortBy(event.target.value)} className="ax-work-select h-10 px-3 text-[11px] font-semibold">
-                <option value="title">Sort · Title</option>
-                <option value="topic">Sort · Topic</option>
-                <option value="difficulty">Sort · Difficulty</option>
+                <option value="title">{copy.sortTitle}</option>
+                <option value="topic">{copy.sortTopic}</option>
+                <option value="difficulty">{copy.sortDifficulty}</option>
               </select>
               <div className="flex h-10 items-center justify-center border-y border-[var(--ax-work-line)] text-[10px] font-semibold text-[var(--ax-text-soft)]">
-                {filteredProblems.length} results
+                {filteredProblems.length} {copy.results}
               </div>
             </div>
           </div>
@@ -111,8 +116,8 @@ export default function ProblemsPage() {
 
         <section className="ax-work-section">
           <div className="mb-5 flex items-end justify-between gap-5">
-            <div><div className="ax-work-kicker">Cases</div><div className="mt-2 font-[family-name:var(--ax-font-display)] text-[26px] tracking-[-0.035em]">Technical problem library</div></div>
-            <div className="hidden text-[10px] text-[var(--ax-text-faint)] md:block">Topic · difficulty · duration · tags</div>
+            <div><div className="ax-work-kicker">{copy.cases}</div><div className="mt-2 font-[family-name:var(--ax-font-display)] text-[26px] tracking-[-0.035em]">{copy.library}</div></div>
+            <div className="hidden text-[10px] text-[var(--ax-text-faint)] md:block">{copy.dimensions}</div>
           </div>
           <div className="ax-work-list">
             {filteredProblems.map((problem, index) => <ProblemDetailCard key={problem.id} index={index} problem={problem} />)}

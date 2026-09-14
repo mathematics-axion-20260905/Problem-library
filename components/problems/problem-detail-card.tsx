@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useLocale } from "@/components/locale-provider";
 
 type ProblemDetailCardProps = {
   index: number;
@@ -15,17 +16,21 @@ type ProblemDetailCardProps = {
 };
 
 export function ProblemDetailCard({ index, problem }: ProblemDetailCardProps) {
+  const { locale } = useLocale();
+  const labels = locale === "uz"
+    ? { topic: "Mavzu", difficulty: "Murakkablik", duration: "Davomiylik" }
+    : { topic: "Topic", difficulty: "Difficulty", duration: "Duration" };
   const content = (
     <article className="ax-work-row grid gap-4 px-1 py-6 sm:px-5 lg:grid-cols-[54px_170px_130px_minmax(0,1fr)_110px] lg:items-start lg:px-6">
       <div className="font-[family-name:var(--ax-font-display)] text-[20px] text-[var(--ax-text-faint)]">{String(index + 1).padStart(2, "0")}</div>
 
       <div>
-        <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-[var(--ax-text-faint)]">Topic</p>
+        <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-[var(--ax-text-faint)]">{labels.topic}</p>
         <p className="mt-1.5 text-[12px] font-semibold text-[var(--ax-text)]">{problem.topic}</p>
       </div>
 
       <div>
-        <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-[var(--ax-text-faint)]">Difficulty</p>
+        <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-[var(--ax-text-faint)]">{labels.difficulty}</p>
         <p className="mt-1.5 text-[12px] font-semibold text-[var(--ax-text)]">{problem.difficulty}</p>
       </div>
 
@@ -40,7 +45,7 @@ export function ProblemDetailCard({ index, problem }: ProblemDetailCardProps) {
       </div>
 
       <div>
-        <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-[var(--ax-text-faint)]">Duration</p>
+        <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-[var(--ax-text-faint)]">{labels.duration}</p>
         <p className="mt-1.5 text-[12px] font-semibold text-[var(--ax-text)]">{problem.duration}</p>
       </div>
     </article>

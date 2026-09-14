@@ -12,6 +12,6 @@ The first-party apps support English (en) and Uzbek (uz).
 
 ## Scope
 
-Product landing pages and shared ecosystem chrome are localized first. Scientific notation, code, file formats, API contracts and researcher-authored content remain unchanged because they are data rather than interface copy.
+Public landing pages, shared ecosystem chrome, and the primary researcher-facing routes are localized. This includes the Math laboratory index and report controls, Notebook workspace controls, Writer documents/project/editor chrome, and Science projects, problems, and problem-detail interface labels. Scientific notation, code, file formats, API contracts and researcher-authored content remain unchanged because they are data rather than interface copy.
 
 New workspace controls should use the same LocaleProvider and useLocale() hook. Keep scientific object payloads locale-neutral; only presentation labels should be translated.
